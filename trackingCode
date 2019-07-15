@@ -1,0 +1,17 @@
+main.cpp
+std::unique_ptr<ROSVideoCapture> capturer(new ROSVideoCapture(cs));
+
+sub_ = nh.subscribe<sensor_msgs::Image>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackRaw, this, _1));
+ROSVideoCapture::ROSCallbackRaw(const sensor_msgs::ImageConstPtr &image)
+	->	ROSVideoCapture::ROSCallback(ros::Time ros_time, const uint8_t *sample, size_t sample_size, int src_width, int src_height, uint32_t fourcc)
+		-> ROSVideoCapture::OnFrame(const webrtc::VideoFrame& frame)
+			-> VideoCapturer::OnFrame(const webrtc::VideoFrame& frame)
+				-> 色々フレームいじる
+					broadcaster_.OnFrame(webrtc::VideoFrame::Builder()
+		                             .set_video_frame_buffer(scaled_buffer)
+		                             .set_rotation(webrtc::kVideoRotation_0)
+		                             .set_timestamp_us(frame.timestamp_us())
+		                             .set_id(frame.id())
+		                             .build());
+		            or broadcaster_.OnFrame(frame);
+		            ここで完結っぽい。

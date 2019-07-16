@@ -21,6 +21,7 @@ public:
   bool setVideoEnabled(bool enabled);
   bool isAudioEnabled();
   bool isVideoEnabled();
+  void close_connection();
 
 private:
   rtc::scoped_refptr<webrtc::MediaStreamInterface> getLocalStream();

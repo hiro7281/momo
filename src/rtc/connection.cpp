@@ -159,3 +159,7 @@ bool RTCConnection::isMediaEnabled(
   }
   return false;
 }
+
+void RTCConnection::close_connection(){
+  _connection->Close();
+}

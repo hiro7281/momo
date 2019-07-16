@@ -108,6 +108,55 @@ int main(int argc, char* argv[])
       }
 
       ioc.run();
+      std::cout << "data_chnnel mode" << std::endl;
+      std::string line;
+      std::string command;
+      std::string parameter;
+      bool is_cmd_mode = true;
+
+      while (std::getline(std::cin, line)) {
+        if (is_cmd_mode) {
+          if (line == "") {
+            continue;
+
+          } else if (line == "send") {
+            std::cout << "cmd_mode became false" << std::endl;
+            command = "send";
+            is_cmd_mode = false;
+
+          } else if (line == "quit") {
+            // スレッドを活かしながらCloseしないと、別スレッドからのイベント待ちになり終了できなくなる
+            rtc_manager->peer_connection->close_connection();
+            // rtc_manager->peer_connection = nullptr;
+            // rtc_manager->data_channel = nullptr;
+            // rtc_manager->_factory = nullptr;
+            // リソースを開放したらスレッドを止めてOK
+            rtc_manager->_networkThread->Stop();
+            rtc_manager->_workerThread->Stop();
+            rtc_manager->_signalingThread->Stop();
+            rtc_manager = nullptr;
+            break;
+
+          } else {
+            std::cout << "?" << line << std::endl;
+          }
+
+        } else {
+          if (line == ";") {
+            if (command == "send") {
+              webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
+              std::cout << "Send(" << rtc_manager->data_channel->state() << ")" << std::endl;
+              rtc_manager->data_channel->Send(buffer);
+            }
+            std::cout << "cmd_mode became true" << std::endl;
+            parameter = "";
+            is_cmd_mode = true;
+
+          } else {
+            parameter += line + "\n";
+          }
+        }
+      }
   }
 
   rtc_manager = nullptr;

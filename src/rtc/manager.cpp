@@ -17,7 +17,6 @@
 
 #include "scalable_track_source.h"
 #include "manager.h"
-#include "observer.h"
 #include "util.h"
 
 #ifdef __APPLE__
@@ -122,9 +121,15 @@ std::shared_ptr<RTCConnection> RTCManager::createConnection(
   rtc_config.enable_dtls_srtp = true;
   rtc_config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
   PeerConnectionObserver *observer = new PeerConnectionObserver(sender);
+  pco = observer;
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> connection = 
       _factory->CreatePeerConnection(
           rtc_config, nullptr, nullptr, observer);
+
+  webrtc::DataChannelInit config;
+  // DataChannelの設定
+  data_channel = connection->CreateDataChannel("data_channel", &config);
+  data_channel->RegisterObserver(dco);
   if (!connection)
   {
     RTC_LOG(LS_ERROR) << __FUNCTION__ << "CreatePeerConnection failed";
@@ -175,6 +180,37 @@ std::shared_ptr<RTCConnection> RTCManager::createConnection(
       RTC_LOG(LS_WARNING) << __FUNCTION__ << "Cannot create video_track";
     }
   }
-
-  return std::make_shared<RTCConnection>(sender, connection);
+  peer_connection = std::make_shared<RTCConnection>(sender, connection);
+  return peer_connection;
 }
+
+// void PeerConnectionObserver::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel) {
+//   std::cout << std::this_thread::get_id() << ":"
+//             << "PeerConnectionObserver::DataChannel(" << data_channel
+//             << ", " << rtc_manager.data_channel.get() << ")" << std::endl;
+//   // Answer送信側は、onDataChannelでDataChannelの接続を受け付ける
+//   rtc_manager.data_channel = data_channel;
+//   rtc_manager.data_channel->RegisterObserver(&rtc_manager.dco);
+// };
+
+// void PeerConnectionObserver::OnIceConnectionChange(
+//         webrtc::PeerConnectionInterface::IceConnectionState new_state)
+// {
+//   _sender->onIceConnectionStateChange(new_state);
+// }
+
+// void PeerConnectionObserver::OnIceCandidate(const webrtc::IceCandidateInterface *candidate)
+// {
+//   std::string sdp;
+//   if (candidate->ToString(&sdp))
+//   {
+//     if (_sender != nullptr)
+//     {
+//       _sender->onIceCandidate(candidate->sdp_mid(), candidate->sdp_mline_index(), sdp);
+//     }
+//   }
+//   else
+//   {
+//     RTC_LOG(LS_ERROR) << "Failed to serialize candidate";
+//   }
+// }

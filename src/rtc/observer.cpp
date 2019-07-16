@@ -3,29 +3,6 @@
 
 #include "observer.h"
 
-
-void PeerConnectionObserver::OnIceConnectionChange(
-        webrtc::PeerConnectionInterface::IceConnectionState new_state)
-{
-  _sender->onIceConnectionStateChange(new_state);
-}
-
-void PeerConnectionObserver::OnIceCandidate(const webrtc::IceCandidateInterface *candidate)
-{
-  std::string sdp;
-  if (candidate->ToString(&sdp))
-  {
-    if (_sender != nullptr)
-    {
-      _sender->onIceCandidate(candidate->sdp_mid(), candidate->sdp_mline_index(), sdp);
-    }
-  }
-  else
-  {
-    RTC_LOG(LS_ERROR) << "Failed to serialize candidate";
-  }
-}
-
 void CreateSessionDescriptionObserver::OnSuccess(webrtc::SessionDescriptionInterface *desc)
 {
   std::string sdp;

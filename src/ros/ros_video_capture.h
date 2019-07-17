@@ -22,7 +22,7 @@ public:
   void ROSCallbackRaw(const sensor_msgs::ImageConstPtr &image);
   void ROSCallbackCompressed(const sensor_msgs::CompressedImageConstPtr &image);
   // virtual void ROSDataCallback(const std_msgs::String::ConstPtr& msg);
-  ros::NodeHandle *nh;
+  // ros::NodeHandle *nh;
 
 private:
   static uint32_t ConvertEncodingType(const std::string encoding);

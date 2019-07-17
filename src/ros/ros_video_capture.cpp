@@ -10,13 +10,14 @@
 
 ROSVideoCapture::ROSVideoCapture(ConnectionSettings cs)
 {
+  ros::NodeHandle nh;
   if (cs.image_compressed)
   {
-    sub_ = nh->subscribe<sensor_msgs::CompressedImage>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackCompressed, this, _1));
+    sub_ = nh.subscribe<sensor_msgs::CompressedImage>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackCompressed, this, _1));
   }
   else
   {
-    sub_ = nh->subscribe<sensor_msgs::Image>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackRaw, this, _1));
+    sub_ = nh.subscribe<sensor_msgs::Image>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackRaw, this, _1));
   }
   // ros::Subscriber sub_data = nh.subscribe("chatter", 1000, boost::bind(&ROSVideoCapture::ROSDataCallback, this, _1));
 

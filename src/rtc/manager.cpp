@@ -102,7 +102,7 @@ RTCManager::RTCManager(ConnectionSettings conn_settings,
           _signalingThread.get(), _workerThread.get(), video_track_source);
   }
 
-  video_track_source->nh->subscribe<std_msgs::String>("chatter", 1000, boost::bind(&RTCManager::ROSDataCallback, this, _1));
+  // video_track_source->nh->subscribe<std_msgs::String>("chatter", 1000, boost::bind(&RTCManager::ROSDataCallback, this, _1));
 }
 
 RTCManager::~RTCManager()
@@ -116,12 +116,12 @@ RTCManager::~RTCManager()
   rtc::CleanupSSL();
 }
 
-void RTCManager::ROSDataCallback(const std_msgs::String::ConstPtr& msg){
-  std::string parameter = msg->data;
-  webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
-  std::cout << "Send(" << data_channel->state() << ")" << std::endl;
-  data_channel->Send(buffer);
-}
+// void RTCManager::ROSDataCallback(const std_msgs::String::ConstPtr& msg){
+//   std::string parameter = msg->data;
+//   // webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
+//   // std::cout << "Send(" << data_channel->state() << ")" << std::endl;
+//   // data_channel->Send(buffer);
+// }
 
 std::shared_ptr<RTCConnection> RTCManager::createConnection(
         webrtc::PeerConnectionInterface::RTCConfiguration rtc_config,

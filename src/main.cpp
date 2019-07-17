@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 #endif
 
   std::unique_ptr<RTCManager> rtc_manager(new RTCManager(cs, std::move(capturer)));
-  
+
   {
       boost::asio::io_context ioc{1};
 
@@ -108,13 +108,6 @@ int main(int argc, char* argv[])
       }
       std::cout << "ioc.run()" << std::endl;
       ioc.run();
-      std::cout << "data_chnnel mode" << std::endl;
-      std::string line;
-      std::string command;
-      std::string parameter;
-      bool is_cmd_mode = true;
-
-
   }
 
   rtc_manager = nullptr;

@@ -10,15 +10,15 @@
 
 ROSVideoCapture::ROSVideoCapture(ConnectionSettings cs)
 {
-  ros::NodeHandle nh;
   if (cs.image_compressed)
   {
-    sub_ = nh.subscribe<sensor_msgs::CompressedImage>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackCompressed, this, _1));
+    sub_ = nh->subscribe<sensor_msgs::CompressedImage>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackCompressed, this, _1));
   }
   else
   {
-    sub_ = nh.subscribe<sensor_msgs::Image>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackRaw, this, _1));
+    sub_ = nh->subscribe<sensor_msgs::Image>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackRaw, this, _1));
   }
+  // ros::Subscriber sub_data = nh.subscribe("chatter", 1000, boost::bind(&ROSVideoCapture::ROSDataCallback, this, _1));
 
   spinner_ = new ros::AsyncSpinner(1);
   spinner_->start();
@@ -33,6 +33,11 @@ void ROSVideoCapture::Destroy()
 {
   spinner_->stop();
 }
+
+// void ROSDataCallback(const std_msgs::String::ConstPtr& msg)
+// {
+//   ROS_INFO("I heard: [%s]", msg->data.c_str());
+// }
 
 void ROSVideoCapture::ROSCallbackRaw(const sensor_msgs::ImageConstPtr &image)
 {

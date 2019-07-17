@@ -7,7 +7,8 @@
 #include "observer.h"
 #include "connection.h"
 #include "connection_settings.h"
-#include "scalable_track_source.h"
+// #include "scalable_track_source.h"
+#include "ros/ros_video_capture.h"
 
 class DCO : public webrtc::DataChannelObserver {
  public:
@@ -38,11 +39,12 @@ class RTCManager
 {
 public:
   RTCManager(ConnectionSettings conn_settings,
-             rtc::scoped_refptr<ScalableVideoTrackSource> video_track_source);
+             rtc::scoped_refptr<ROSVideoCapture> video_track_source);
   ~RTCManager();
   std::shared_ptr<RTCConnection> createConnection(
           webrtc::PeerConnectionInterface::RTCConfiguration rtc_config,
           RTCMessageSender *sender);
+  void ROSDataCallback(const std_msgs::String::ConstPtr& msg);
 
   class PeerConnectionObserver : public webrtc::PeerConnectionObserver
   {

@@ -15,7 +15,7 @@
 #include "rtc_base/ssl_adapter.h"
 #include "rtc_base/logging.h"
 
-#include "scalable_track_source.h"
+// #include "scalable_track_source.h"
 #include "manager.h"
 #include "util.h"
 
@@ -37,7 +37,7 @@
 #endif
 
 RTCManager::RTCManager(ConnectionSettings conn_settings,
-                       rtc::scoped_refptr<ScalableVideoTrackSource> video_track_source)
+                       rtc::scoped_refptr<ROSVideoCapture> video_track_source)
                        : _conn_settings(conn_settings)
 {
   rtc::InitializeSSL();
@@ -101,6 +101,8 @@ RTCManager::RTCManager(ConnectionSettings conn_settings,
     _video_source = webrtc::VideoTrackSourceProxy::Create(
           _signalingThread.get(), _workerThread.get(), video_track_source);
   }
+
+  video_track_source->nh->subscribe<std_msgs::String>("chatter", 1000, boost::bind(&RTCManager::ROSDataCallback, this, _1));
 }
 
 RTCManager::~RTCManager()
@@ -112,6 +114,13 @@ RTCManager::~RTCManager()
   _signalingThread->Stop();
 
   rtc::CleanupSSL();
+}
+
+void RTCManager::ROSDataCallback(const std_msgs::String::ConstPtr& msg){
+  std::string parameter = msg->data;
+  webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
+  std::cout << "Send(" << data_channel->state() << ")" << std::endl;
+  data_channel->Send(buffer);
 }
 
 std::shared_ptr<RTCConnection> RTCManager::createConnection(

@@ -5,7 +5,7 @@
 
 #include "sensor_msgs/Image.h"
 #include "sensor_msgs/CompressedImage.h"
-
+#include "std_msgs/String.h"
 
 #include "connection_settings.h"
 #include "rtc/scalable_track_source.h"
@@ -21,6 +21,8 @@ public:
   // ROS Callback
   void ROSCallbackRaw(const sensor_msgs::ImageConstPtr &image);
   void ROSCallbackCompressed(const sensor_msgs::CompressedImageConstPtr &image);
+  // virtual void ROSDataCallback(const std_msgs::String::ConstPtr& msg);
+  ros::NodeHandle *nh;
 
 private:
   static uint32_t ConvertEncodingType(const std::string encoding);
@@ -28,6 +30,7 @@ private:
 
   ros::AsyncSpinner* spinner_;
   ros::Subscriber sub_;
+  ros::Subscriber sub_data;
 };
 
 #endif

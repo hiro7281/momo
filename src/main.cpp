@@ -88,8 +88,8 @@ int main(int argc, char* argv[])
 #endif
 
 std::unique_ptr<RTCManager> rtc_manager(new RTCManager(cs, std::move(capturer)));
-  {
 
+  {
       // void ROSDataCallback(const std_msgs::String::ConstPtr& msg){
       //   std::string parameter = msg->data;
       //   webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
@@ -97,12 +97,16 @@ std::unique_ptr<RTCManager> rtc_manager(new RTCManager(cs, std::move(capturer)))
       //   rtc_manager.data_channel->Send(buffer);
       // }
       // ros::NodeHandle nh;
-      // nh.subscribe("chatter", 100, ROSDataCallback);
+      // nh.subscribe("chatter", 100, TestClass::ROSDataCallback);
 
-      std::string parameter = "Hello World";
+      // std::string parameter = "Hello World";
+      // std::cout << "aaa" << std::endl;
       // webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
+      // std::cout << "bbb" << std::endl;
       // std::cout << "Send(" << rtc_manager->data_channel->state() << ")" << std::endl;
+      // std::cout << "ccc" << std::endl;
       // rtc_manager->data_channel->Send(buffer);
+      // std::cout << "ddd" << std::endl;
 
       boost::asio::io_context ioc{1};
 
@@ -127,6 +131,7 @@ std::unique_ptr<RTCManager> rtc_manager(new RTCManager(cs, std::move(capturer)))
 
       std::cout << "ioc.run()" << std::endl;
       ioc.run();
+      std::cout << "ioc.run() is done" << std::endl;
   }
 
   // RTC::rtc = nullptr;

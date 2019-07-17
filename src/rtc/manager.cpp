@@ -139,6 +139,9 @@ std::shared_ptr<RTCConnection> RTCManager::createConnection(
   // DataChannelの設定
   data_channel = connection->CreateDataChannel("data_channel", &config);
   data_channel->RegisterObserver(dco);
+
+  ros::NodeHandle nh;
+  nh.subscribe("chatter", 100, &RTCManager::ROSDataCallback, this);
   if (!connection)
   {
     RTC_LOG(LS_ERROR) << __FUNCTION__ << "CreatePeerConnection failed";
@@ -191,6 +194,16 @@ std::shared_ptr<RTCConnection> RTCManager::createConnection(
   }
   peer_connection = std::make_shared<RTCConnection>(sender, connection);
   return peer_connection;
+}
+
+void RTCManager::ROSDataCallback(const std_msgs::String::ConstPtr& msg){
+  std::string parameter = msg->data;
+  std::cout << "aaa" << std::endl;
+  webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
+  std::cout << "bbb" << std::endl;
+  std::cout << "Send(" << data_channel->state() << ")" << std::endl;
+  data_channel->Send(buffer);
+  std::cout << "ccc" << std::endl;
 }
 
 // void PeerConnectionObserver::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel) {

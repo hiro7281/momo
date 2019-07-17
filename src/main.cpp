@@ -87,9 +87,23 @@ int main(int argc, char* argv[])
   }
 #endif
 
-  std::unique_ptr<RTCManager> rtc_manager(new RTCManager(cs, std::move(capturer)));
-
+std::unique_ptr<RTCManager> rtc_manager(new RTCManager(cs, std::move(capturer)));
   {
+
+      // void ROSDataCallback(const std_msgs::String::ConstPtr& msg){
+      //   std::string parameter = msg->data;
+      //   webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
+      //   std::cout << "Send(" << rtc_manager.data_channel->state() << ")" << std::endl;
+      //   rtc_manager.data_channel->Send(buffer);
+      // }
+      // ros::NodeHandle nh;
+      // nh.subscribe("chatter", 100, ROSDataCallback);
+
+      std::string parameter = "Hello World";
+      // webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
+      // std::cout << "Send(" << rtc_manager->data_channel->state() << ")" << std::endl;
+      // rtc_manager->data_channel->Send(buffer);
+
       boost::asio::io_context ioc{1};
 
       boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
@@ -99,17 +113,23 @@ int main(int argc, char* argv[])
 
       if (use_sora) {
         const boost::asio::ip::tcp::endpoint endpoint{boost::asio::ip::make_address("127.0.0.1"), static_cast<unsigned short>(cs.port)};
+        // std::make_shared<SoraServer>(ioc, endpoint, RTC::rtc.get(), cs)->run();
         std::make_shared<SoraServer>(ioc, endpoint, rtc_manager.get(), cs)->run();
+        std::cout << "use_sora" << std::endl;
       }
 
       if (use_p2p) {
         const boost::asio::ip::tcp::endpoint endpoint{boost::asio::ip::make_address("0.0.0.0"), static_cast<unsigned short>(cs.port)};
+        // std::make_shared<P2PServer>(ioc, endpoint, std::make_shared<std::string>(cs.p2p_document_root), RTC::rtc.get(), cs)->run();
         std::make_shared<P2PServer>(ioc, endpoint, std::make_shared<std::string>(cs.p2p_document_root), rtc_manager.get(), cs)->run();
+        std::cout << "use_p2p" << std::endl;
       }
+
       std::cout << "ioc.run()" << std::endl;
       ioc.run();
   }
 
+  // RTC::rtc = nullptr;
   rtc_manager = nullptr;
 
   return 0;

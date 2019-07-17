@@ -40,6 +40,7 @@ RTCManager::RTCManager(ConnectionSettings conn_settings,
                        rtc::scoped_refptr<ROSVideoCapture> video_track_source)
                        : _conn_settings(conn_settings)
 {
+  vts = video_track_source;
   rtc::InitializeSSL();
 
   _networkThread = rtc::Thread::CreateWithSocketServer();
@@ -140,8 +141,12 @@ std::shared_ptr<RTCConnection> RTCManager::createConnection(
   data_channel = connection->CreateDataChannel("data_channel", &config);
   data_channel->RegisterObserver(dco);
 
-  ros::NodeHandle nh;
-  nh.subscribe("chatter", 100, &RTCManager::ROSDataCallback, this);
+  vts->CaptureData(data_channel);
+  // ros::NodeHandle nh;
+  // nh.subscribe("chatter", 100, &RTCManager::ROSDataCallback, this);
+
+  vts->CaptureStart();
+
   if (!connection)
   {
     RTC_LOG(LS_ERROR) << __FUNCTION__ << "CreatePeerConnection failed";
@@ -196,15 +201,15 @@ std::shared_ptr<RTCConnection> RTCManager::createConnection(
   return peer_connection;
 }
 
-void RTCManager::ROSDataCallback(const std_msgs::String::ConstPtr& msg){
-  std::string parameter = msg->data;
-  std::cout << "aaa" << std::endl;
-  webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
-  std::cout << "bbb" << std::endl;
-  std::cout << "Send(" << data_channel->state() << ")" << std::endl;
-  data_channel->Send(buffer);
-  std::cout << "ccc" << std::endl;
-}
+// void RTCManager::ROSDataCallback(const std_msgs::String::ConstPtr& msg){
+//   std::string parameter = msg->data;
+//   std::cout << "aaa" << std::endl;
+//   webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
+//   std::cout << "bbb" << std::endl;
+//   std::cout << "Send(" << data_channel->state() << ")" << std::endl;
+//   data_channel->Send(buffer);
+//   std::cout << "ccc" << std::endl;
+// }
 
 // void PeerConnectionObserver::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel) {
 //   std::cout << std::this_thread::get_id() << ":"

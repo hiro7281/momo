@@ -44,7 +44,7 @@ public:
   std::shared_ptr<RTCConnection> createConnection(
           webrtc::PeerConnectionInterface::RTCConfiguration rtc_config,
           RTCMessageSender *sender);
-  void ROSDataCallback(const std_msgs::String::ConstPtr& msg);
+  // void ROSDataCallback(const std_msgs::String::ConstPtr& msg);
   // void ROSDataCallback(std_msgs::String msg);
 
   class PeerConnectionObserver : public webrtc::PeerConnectionObserver
@@ -96,7 +96,7 @@ public:
   private:
     RTCMessageSender *_sender;
   };
-
+  ROSVideoCapture *vts;
   std::shared_ptr<RTCConnection> peer_connection;
   PeerConnectionObserver *pco;
   rtc::scoped_refptr<DCO> dco;

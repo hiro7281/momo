@@ -10,7 +10,8 @@
 
 ROSVideoCapture::ROSVideoCapture(ConnectionSettings cs)
 {
-  ros::NodeHandle nh;
+  ros::NodeHandle nhandle;
+  nh = nhandle;
   if (cs.image_compressed)
   {
     sub_ = nh.subscribe<sensor_msgs::CompressedImage>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackCompressed, this, _1));
@@ -20,9 +21,9 @@ ROSVideoCapture::ROSVideoCapture(ConnectionSettings cs)
     sub_ = nh.subscribe<sensor_msgs::Image>(cs.camera_name, 1, boost::bind(&ROSVideoCapture::ROSCallbackRaw, this, _1));
   }
   // ros::Subscriber sub_data = nh.subscribe("chatter", 1000, boost::bind(&ROSVideoCapture::ROSDataCallback, this, _1));
-
-  spinner_ = new ros::AsyncSpinner(1);
-  spinner_->start();
+  sub_data = nh.subscribe("chatter", 100, &ROSVideoCapture::ROSDataCallback, this);
+  // spinner_ = new ros::AsyncSpinner(1);
+  // spinner_->start();
 }
 
 ROSVideoCapture::~ROSVideoCapture()
@@ -30,15 +31,31 @@ ROSVideoCapture::~ROSVideoCapture()
   Destroy();
 }
 
+void ROSVideoCapture::CaptureData(rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel){
+  dc = data_channel;
+  // sub_data = nh.subscribe("chatter", 100, &ROSVideoCapture::ROSDataCallback, this);
+}
+
+void ROSVideoCapture::CaptureStart(){
+  spinner_ = new ros::AsyncSpinner(1);
+  spinner_->start();
+}
+
 void ROSVideoCapture::Destroy()
 {
   spinner_->stop();
 }
 
-// void ROSDataCallback(const std_msgs::String::ConstPtr& msg)
-// {
-//   ROS_INFO("I heard: [%s]", msg->data.c_str());
-// }
+void ROSVideoCapture::ROSDataCallback(const std_msgs::String::ConstPtr& msg)
+{
+  std::string parameter = msg->data;
+  std::cout << "aaa" << std::endl;
+  webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
+  std::cout << "bbb" << std::endl;
+  std::cout << "Send(" << dc->state() << ")" << std::endl;
+  dc->Send(buffer);
+  std::cout << "ccc" << std::endl;
+}
 
 void ROSVideoCapture::ROSCallbackRaw(const sensor_msgs::ImageConstPtr &image)
 {

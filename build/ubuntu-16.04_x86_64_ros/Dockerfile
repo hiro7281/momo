@@ -73,3 +73,7 @@ RUN \
       --prefix=/root/boost-$BOOST_VERSION \
       --with-filesystem \
   "
+
+RUN sudo apt update
+
+RUN sudo apt -y install libnss3 gstreamer1.0-alsa ros-kinetic-usb-cam ros-kinetic-audio-common net-tools

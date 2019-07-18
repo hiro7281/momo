@@ -7,9 +7,11 @@ let hasReceivedSdp = false;
 const iceServers = [{ 'urls': 'stun:stun.l.google.com:19302' }];
 // peer connection の 設定
 const peerConnectionConfig = {
-  'iceServers': iceServers
+  'iceServers': iceServers,
+  'sdpSemantics':'unified-plan'
 };
 
+let peer, dc, data = {};
 
 const isSSL = location.protocol === 'https:';
 const wsProtocol = isSSL ? 'wss://' : 'ws://';
@@ -18,6 +20,35 @@ const ws = new WebSocket(wsUrl);
 ws.onopen = onWsOpen.bind();
 ws.onerror = onWsError.bind();
 ws.onmessage = onWsMessage.bind();
+
+function buf2str(buf) {
+  return String.fromCharCode.apply("", new Uint8Array(buf))
+}
+
+function onDataChannelAdded(e){
+    console.log('Data Channel add');
+    dc = e.channel;
+    setupDataHandlers();
+    // sendchat("hello");
+}
+
+function setupDataHandlers(){
+    //dataにmethodを与えていく
+    data.send = function(msg){
+        msg = JSON.stringify(msg);
+        console.log('sending' + msg + 'over data channel.');
+        dc.send(msg);
+    };
+    dc.onmessage = function(e){
+        //メッセージ受信時の処理
+        // let msg = JSON.parse(e.data);
+        console.log('receiveed message >> '+ buf2str(e.data));
+    };
+    dc.onopen = function(e){
+        //メッセージ受信時の処理
+        console.log('data channel open!');
+    };
+}
 
 function onWsError(error){
   console.error('ws onerror() ERROR:', error);
@@ -116,7 +147,10 @@ function playVideo(element, stream) {
 }
 
 function prepareNewConnection() {
-  const peer = new RTCPeerConnection(peerConnectionConfig);
+  peer = new RTCPeerConnection(peerConnectionConfig);
+  
+  peer.ondatachannel = onDataChannelAdded;
+
   if ('ontrack' in peer) {
     if (isSafari()) {
       let tracks = [];
@@ -203,10 +237,13 @@ function sendSdp(sessionDescription) {
 
 async function makeOffer() {
   peerConnection = prepareNewConnection();
+
+  dc = peer.createDataChannel('data_channel');
+
   try {
     const sessionDescription = await peerConnection.createOffer({
-      'offerToReceiveAudio': true,
-      'offerToReceiveVideo': true
+      'offerToReceiveAudio': false,
+      'offerToReceiveVideo': false
     })
     console.log('createOffer() success in promise, SDP=', sessionDescription.sdp);
     switch (document.getElementById('codec').value) {
@@ -255,6 +292,8 @@ function setOffer(sessionDescription) {
     console.error('peerConnection already exists!');
   }
   const peerConnection = prepareNewConnection();
+  dc = peer.createDataChannel('data_channel');
+  setupDataHandlers();
   peerConnection.onnegotiationneeded = async function () {
     try{
       await peerConnection.setRemoteDescription(sessionDescription);

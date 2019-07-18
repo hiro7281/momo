@@ -52,7 +52,7 @@ public:
   public:
     RTCManager *rtc_manager;
     PeerConnectionObserver(RTCMessageSender *sender) : _sender(sender) {};
-  protected:
+
     void OnSignalingChange(
             webrtc::PeerConnectionInterface::SignalingState new_state) override {}
     void OnAddStream(
@@ -64,9 +64,9 @@ public:
                 << "PeerConnectionObserver::DataChannel(" << data_channel
                 << ", " << rtc_manager->data_channel.get() << ")" << std::endl;
       // Answer送信側は、onDataChannelでDataChannelの接続を受け付ける
-      rtc_manager->data_channel = data_channel;
+      //rtc_manager->data_channel = data_channel;
       std::cout << "aaa" << std::endl;
-      rtc_manager->data_channel->RegisterObserver(rtc_manager->dco);
+      //rtc_manager->data_channel->RegisterObserver(rtc_manager->dco);
       std::cout << "bbb" << std::endl;
     };
     void OnRenegotiationNeeded() override {}

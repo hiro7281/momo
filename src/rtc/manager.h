@@ -65,7 +65,9 @@ public:
                 << ", " << rtc_manager->data_channel.get() << ")" << std::endl;
       // Answer送信側は、onDataChannelでDataChannelの接続を受け付ける
       rtc_manager->data_channel = data_channel;
+      std::cout << "aaa" << std::endl;
       rtc_manager->data_channel->RegisterObserver(rtc_manager->dco);
+      std::cout << "bbb" << std::endl;
     };
     void OnRenegotiationNeeded() override {}
     void OnIceConnectionChange(

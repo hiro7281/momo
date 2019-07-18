@@ -32,7 +32,9 @@ ROSVideoCapture::~ROSVideoCapture()
 }
 
 void ROSVideoCapture::CaptureData(rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel){
+  std::cout << "CaptureData" << std::endl;
   dc = data_channel;
+  std::cout << "CaptureData end" << std::endl;
   // sub_data = nh.subscribe("chatter", 100, &ROSVideoCapture::ROSDataCallback, this);
 }
 
@@ -49,12 +51,12 @@ void ROSVideoCapture::Destroy()
 void ROSVideoCapture::ROSDataCallback(const std_msgs::String::ConstPtr& msg)
 {
   std::string parameter = msg->data;
-  std::cout << "aaa" << std::endl;
+  std::cout << "data callback" << std::endl;
   webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(parameter.c_str(), parameter.size()), true);
-  std::cout << "bbb" << std::endl;
+  std::cout << "data callback1" << std::endl;
   std::cout << "Send(" << dc->state() << ")" << std::endl;
   dc->Send(buffer);
-  std::cout << "ccc" << std::endl;
+  std::cout << "data callback2" << std::endl;
 }
 
 void ROSVideoCapture::ROSCallbackRaw(const sensor_msgs::ImageConstPtr &image)

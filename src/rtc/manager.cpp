@@ -136,16 +136,21 @@ std::shared_ptr<RTCConnection> RTCManager::createConnection(
       _factory->CreatePeerConnection(
           rtc_config, nullptr, nullptr, observer);
 
+  std::cout << "Data channel config" << std::endl;
   webrtc::DataChannelInit config;
   // DataChannelの設定
+  std::cout << "CreateDataChannel" << std::endl;
   data_channel = connection->CreateDataChannel("data_channel", &config);
+  std::cout << "RegisterObserver" << std::endl;
   data_channel->RegisterObserver(dco);
+  std::cout << "RegisterObserver end" << std::endl;
 
   vts->CaptureData(data_channel);
   // ros::NodeHandle nh;
   // nh.subscribe("chatter", 100, &RTCManager::ROSDataCallback, this);
 
   vts->CaptureStart();
+  std::cout << "CaptureStart end" << std::endl;
 
   if (!connection)
   {

@@ -22,7 +22,7 @@ ROSVideoCapture::ROSVideoCapture(ConnectionSettings cs)
   }
   // ros::Subscriber sub_data = nh.subscribe("chatter", 1000, boost::bind(&ROSVideoCapture::ROSDataCallback, this, _1));
   sub_data = nh.subscribe("chatter", 100, &ROSVideoCapture::ROSDataCallback, this);
-  sub_velodyne = nh.subscribe("velodyne_packets", 100, &ROSVideoCapture::ROSVelodyneCallback, this);
+  sub_velodyne = nh.subscribe("velodyne16/velodyne_packets", 100, &ROSVideoCapture::ROSVelodyneCallback, this);
   // spinner_ = new ros::AsyncSpinner(1);
   // spinner_->start();
 }
@@ -63,6 +63,7 @@ void ROSVideoCapture::ROSVelodyneCallback(const velodyne_msgs::VelodyneScan::Con
   int packets_length = msg->packets.size();
   // std::vector<std::vector<unsigned char>> data(packets_length, vector<unsigned char>(1206, 0));
   unsigned char* data;
+  data = (unsigned char *)malloc(packets_length * 1206 * sizeof(unsigned char));
   std::cout << "for loop" << std::endl;
   for(int i = 0; i < packets_length; i++){
     for(int j = 0; j < 1206; j++){
@@ -74,6 +75,8 @@ void ROSVideoCapture::ROSVelodyneCallback(const velodyne_msgs::VelodyneScan::Con
   std::cout << "velodyne data send" << std::endl;
   dc->Send(buffer);
   std::cout << "velodyne data sended" << std::endl;
+  free(data);
+ std::cout << "freed" << std::endl; 
 }
 
 void ROSVideoCapture::ROSCallbackRaw(const sensor_msgs::ImageConstPtr &image)

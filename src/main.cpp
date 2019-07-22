@@ -129,7 +129,7 @@ std::unique_ptr<RTCManager> rtc_manager(new RTCManager(cs, std::move(capturer)))
         std::cout << "use_p2p" << std::endl;
       }
 
-      std::cout << "ioc.run()" << std::endl;
+      std::cout << "ioc.run();" << std::endl;
       ioc.run();
       std::cout << "ioc.run() is done" << std::endl;
   }

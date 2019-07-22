@@ -135,7 +135,7 @@ std::unique_ptr<RTCManager> rtc_manager(new RTCManager(cs, std::move(capturer)))
   }
 
   // RTC::rtc = nullptr;
-  rtc_manager = nullptr;
+  rtc_manager->~RTCManager();
 
   return 0;
 }

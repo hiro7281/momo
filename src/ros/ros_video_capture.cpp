@@ -22,6 +22,7 @@ ROSVideoCapture::ROSVideoCapture(ConnectionSettings cs)
   }
   // ros::Subscriber sub_data = nh.subscribe("chatter", 1000, boost::bind(&ROSVideoCapture::ROSDataCallback, this, _1));
   sub_data = nh.subscribe("chatter", 100, &ROSVideoCapture::ROSDataCallback, this);
+  sub_velodyne = nh.subscribe("velodyne_packets", 100, &ROSVideoCapture::ROSVelodyneCallback, this);
   // spinner_ = new ros::AsyncSpinner(1);
   // spinner_->start();
 }
@@ -57,6 +58,22 @@ void ROSVideoCapture::ROSDataCallback(const std_msgs::String::ConstPtr& msg)
   std::cout << "Send(" << dc->state() << ")" << std::endl;
   dc->Send(buffer);
   std::cout << "data callback2" << std::endl;
+}
+void ROSVideoCapture::ROSVelodyneCallback(const velodyne_msgs::VelodyneScan::ConstPtr& msg){
+  int packets_length = msg->packets.size();
+  // std::vector<std::vector<unsigned char>> data(packets_length, vector<unsigned char>(1206, 0));
+  unsigned char* data;
+  std::cout << "for loop" << std::endl;
+  for(int i = 0; i < packets_length; i++){
+    for(int j = 0; j < 1206; j++){
+      data[i*1206 + j] = msg->packets[i].data[j];
+    }
+  }
+  std::cout << "velodyne data buffer" << std::endl;
+  webrtc::DataBuffer buffer(rtc::CopyOnWriteBuffer(data, 1206*packets_length), true);
+  std::cout << "velodyne data send" << std::endl;
+  dc->Send(buffer);
+  std::cout << "velodyne data sended" << std::endl;
 }
 
 void ROSVideoCapture::ROSCallbackRaw(const sensor_msgs::ImageConstPtr &image)

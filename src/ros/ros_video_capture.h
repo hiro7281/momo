@@ -6,6 +6,7 @@
 #include "sensor_msgs/Image.h"
 #include "sensor_msgs/CompressedImage.h"
 #include "std_msgs/String.h"
+#include "velodyne_msgs/VelodyneScan.h"
 
 #include "connection_settings.h"
 #include "rtc/scalable_track_source.h"
@@ -25,6 +26,7 @@ public:
   void CaptureData(rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel);
   void CaptureStart();
   void ROSDataCallback(const std_msgs::String::ConstPtr& msg);
+  void ROSVelodyneCallback(const velodyne_msgs::VelodyneScan::ConstPtr& msg);
   // ros::NodeHandle *nh;
   rtc::scoped_refptr<webrtc::DataChannelInterface> dc;
 
@@ -36,6 +38,7 @@ private:
   ros::AsyncSpinner* spinner_;
   ros::Subscriber sub_;
   ros::Subscriber sub_data;
+  ros::Subscriber sub_velodyne;
 };
 
 #endif

@@ -42,7 +42,9 @@ function setupDataHandlers(){
     dc.onmessage = function(e){
         //メッセージ受信時の処理
         // let msg = JSON.parse(e.data);
-        console.log('receiveed message >> '+ buf2str(e.data));
+        // console.log('receiveed message >> '+ buf2str(e.data));
+        var buf = new Uint8Array(e.data);
+        console.log('recieved message >> ' + buf);
     };
     dc.onopen = function(e){
         //メッセージ受信時の処理
